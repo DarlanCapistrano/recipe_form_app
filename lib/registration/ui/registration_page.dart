@@ -7,8 +7,7 @@ import 'package:state_management_with_rxdart/registration/registration_controlle
 import 'package:state_management_with_rxdart/registration/registration_model.dart';
 
 class RegistrationPage extends StatefulWidget {
-  final int formId;
-  const RegistrationPage(this.formId, {Key? key}) : super(key: key);
+  const RegistrationPage({Key? key}) : super(key: key);
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -16,31 +15,28 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final RegistrationController _registrationController = RegistrationController();
-
-  String? category;
+  final categoryTypesList = const ["Italiano" , "Rápido", "Hamburgers", "Alemã", "Saudável", "Exótica", "Café da Manhã", "Asiática", "Francesa", "Verão"];
 
   @override
   void initState() {
-    _registrationController.initFormRegistration(widget.formId);
+    _registrationController.initFormRegistration();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.red),
-      body: streamFormRegistration(),
-      floatingActionButton: FloatingActionButton(
-        child: const Text("Salvar"),
-        onPressed: (){
-          // registrationController.insertMealDatabase(category: category);
-        }
+      appBar: AppBar(
+        backgroundColor: Colors.red,
+        actions: [IconButton(onPressed: () => _registrationController.finishFormRegistration(context), icon: const Icon(Icons.check))],
+        title: const Text("Cadastrar receita"),
       ),
+      body: streamFormRegistration(),
     );
   }
 
   Widget streamFormRegistration(){
-    return StreamBuilder<FormRegistration>(
+    return StreamBuilder<Recipe>(
       stream: _registrationController.controllerFormRegistration.stream,
       builder: (context, snapshot) {
         if(snapshot.data != null){
@@ -52,22 +48,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget bodyFormRegistration(FormRegistration form){
+  Widget bodyFormRegistration(Recipe form){
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           imageItem(form),
           buildForm(form),
-          expasionPanelItem(form, ItemRegistrationType.ingredientes),
-          expasionPanelItem(form, ItemRegistrationType.passos),
-          const SizedBox(height: 80),
+          expasionPanelWidget(form),
         ],
       ),
     );
   }
 
-  Widget imageItem(FormRegistration form){
+  Widget imageItem(Recipe form){
     return InkWell(
       onTap: () => _registrationController.clickAddImage(form),
       child: form.imgUrl == null 
@@ -90,9 +84,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget buildForm(FormRegistration form){
+  Widget buildForm(Recipe form){
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -107,22 +101,22 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget textFieldMealItem(FormRegistration form){
+  Widget textFieldMealItem(Recipe form){
     return TextField(
-      decoration: const InputDecoration(hintText: "ex: Ovo mexido", labelText: "Nome da receita"),
+      decoration: const InputDecoration(labelText: "Nome da receita"),
       onChanged: (text) => _registrationController.updateMealName(form, text),
     );
   }
 
-  Widget dropDownCategoryItem(FormRegistration form){
+  Widget dropDownCategoryItem(Recipe form){
     return DropdownButton<String>(
       hint: Text(form.category ?? "Categorias"),
-      items: ["Italiano" , "Rápido & Fácil", "Hamburgers", "Alemã", "Leve & Saudável", "Exótica", "Café da Manhã","Asiática","Francesa", "Verão"].map((name) => DropdownMenuItem(child: Text(name), value: name)).toList(),
+      items: categoryTypesList.map((name) => DropdownMenuItem(child: Text(name), value: name)).toList(),
       onChanged: (newCategory) => _registrationController.updateCategory(form, newCategory),
     );
   }
 
-  Widget textFieldDurationItem(FormRegistration form){
+  Widget textFieldDurationItem(Recipe form){
     return SizedBox(
       width: 150,
       child: Form(
@@ -143,7 +137,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget radioListItems(FormRegistration form, List<String> items, ItemRegistrationType radioType){
+  Widget radioListItems(Recipe form, List<String> items, ItemRegistrationType radioType){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -180,17 +174,60 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget expasionPanelItem(FormRegistration form, ItemRegistrationType panelType){
-    return ExpansionPanelList(
-      expansionCallback: (panelIndex, isExpanded) => _registrationController.expandPanel(form, panelType),
-      children: [
-        ExpansionPanel(
-          isExpanded: panelType == ItemRegistrationType.ingredientes ? form.ingredientIsExpanded : form.stepIsExpanded,
-          canTapOnHeader: true,
-          headerBuilder: (context, isExpanded) => Text("Insira os ${panelType.name}"),
-          body: const Text("TESTE")
-        )
-      ],
+  Widget expasionPanelWidget(Recipe form){
+    final textController = TextEditingController();
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+      child: ExpansionPanelList(
+        expansionCallback: (panelIndex, isExpanded) => _registrationController.expandPanel(form),
+        children: [
+          ExpansionPanel(
+            isExpanded: form.ingredientIsExpanded,
+            canTapOnHeader: true,
+            headerBuilder: (context, isExpanded) => const Padding(padding: EdgeInsets.only(left: 10, top: 15), child: Text("Insira os ingredientes")),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  expandedPanelList(form),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Adicionar ingrediente",
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(onPressed: () => _registrationController.addIngredient(form, textController), icon: const Icon(Icons.add)),
+                    ),
+                    controller: textController,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget expandedPanelList(Recipe form){
+    return ListView.separated(
+      separatorBuilder: (context, index) => const Divider(color: Colors.grey),
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: form.ingredients.length,
+      itemBuilder: (context, index) => expandedPanelItem(form, form.ingredients[index]),
+    );
+  }
+
+  Widget expandedPanelItem(Recipe form, Ingredient ingredient){
+    return Container(
+      margin: const EdgeInsets.only(left: 4, bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(ingredient.name ?? "", style: const TextStyle(fontSize: 16)),
+          IconButton(onPressed: () => _registrationController.removeIngredient(form, ingredient), icon: const Icon(Icons.delete))
+        ],
+      ),
     );
   }
 }

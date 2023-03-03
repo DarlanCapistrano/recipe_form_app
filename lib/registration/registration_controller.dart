@@ -6,15 +6,15 @@ import 'package:rxdart/subjects.dart';
 
 class RegistrationController {
 
-  BehaviorSubject<FormRegistration> controllerFormRegistration = BehaviorSubject<FormRegistration>();
+  BehaviorSubject<Recipe> controllerFormRegistration = BehaviorSubject<Recipe>();
 
   final formKey = GlobalKey<FormState>();
 
-  void initFormRegistration(int formId){
-    controllerFormRegistration.sink.add(FormRegistration(id: formId));
+  void initFormRegistration(){
+    controllerFormRegistration.sink.add(Recipe());
   }
 
-  Future<void> clickAddImage(FormRegistration form) async {
+  Future<void> clickAddImage(Recipe form) async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
     if(image != null){
       form.imgUrl = image.path;
@@ -22,24 +22,24 @@ class RegistrationController {
     }
   }
 
-  void updateMealName(FormRegistration form, String text){
+  void updateMealName(Recipe form, String text){
     form.mealName = text;
     controllerFormRegistration.sink.add(form);
   }
 
-  void updateDuration(FormRegistration form, String text){
+  void updateDuration(Recipe form, String text){
     if(formKey.currentState!.validate()){
       form.duration = double.parse(text.replaceAll(",", "."));
       controllerFormRegistration.sink.add(form);
     }
   }
 
-  void updateCategory(FormRegistration form, String? newCategory){
+  void updateCategory(Recipe form, String? newCategory){
     form.category = newCategory;
     controllerFormRegistration.sink.add(form);
   }
 
-  void updateRadioItem(FormRegistration form, ItemRegistrationType radioType, String? value){
+  void updateRadioItem(Recipe form, ItemRegistrationType radioType, String? value){
     if(radioType == ItemRegistrationType.dificuldade){
       form.difficulty = value;
     } else {
@@ -48,12 +48,25 @@ class RegistrationController {
     controllerFormRegistration.sink.add(form);
   }
 
-  void expandPanel(FormRegistration form, ItemRegistrationType panelType){
-    if(panelType == ItemRegistrationType.ingredientes){
-      form.ingredientIsExpanded = !form.ingredientIsExpanded;
-    } else {
-      form.stepIsExpanded = !form.stepIsExpanded;
-    }
+  void expandPanel(Recipe form){
+    form.ingredientIsExpanded = !form.ingredientIsExpanded;
     controllerFormRegistration.sink.add(form);
+  }
+
+  void addIngredient(Recipe form, TextEditingController textController){
+    if(textController.text.isNotEmpty){
+      form.ingredients.add(Ingredient(name: textController.text));
+      controllerFormRegistration.sink.add(form);
+      textController.clear();
+    }
+  }
+
+  void removeIngredient(Recipe form, Ingredient ingredient){
+    form.ingredients.removeWhere((e) => e == ingredient);
+    controllerFormRegistration.sink.add(form);
+  }
+
+  void finishFormRegistration(BuildContext context){
+    Navigator.pop(context, controllerFormRegistration.stream.valueOrNull);
   }
 }

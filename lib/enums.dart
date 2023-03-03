@@ -1,3 +1,3 @@
 enum ItemRegistrationType {
-  dificuldade, custo, ingredientes, passos
+  dificuldade, custo,
 }

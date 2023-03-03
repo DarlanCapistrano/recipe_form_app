@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:state_management_with_rxdart/registration/ui/registration_page.dart';
+import 'package:state_management_with_rxdart/recipes/ui/recipes_page.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({ Key? key }) : super(key: key);
@@ -13,7 +13,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: RegistrationPage(1)
+      home: RecipesPage(),
     );
   }
 }
