@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:state_management_with_rxdart/recipes/recipes_controller.dart';
 import 'package:state_management_with_rxdart/registration/registration_model.dart';
 
@@ -33,7 +31,13 @@ class _RecipesPageState extends State<RecipesPage> {
       stream: _recipesController.controllerRecipes.stream,
       builder: (context, snapshot) {
         if(snapshot.data != null){
-          return bodyRecipes(snapshot.data!);
+          if(snapshot.data!.isNotEmpty){
+            return bodyRecipes(snapshot.data!);
+          } else {
+            return const Center(
+              child: Text("Nenhuma receita disponível"),
+            );
+          }
         } else{
           return const CircularProgressIndicator();
         }
