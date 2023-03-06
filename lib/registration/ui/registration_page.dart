@@ -27,7 +27,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.red[800],
         actions: [IconButton(onPressed: () => _registrationController.finishFormRegistration(context), icon: const Icon(Icons.check))],
         title: const Text("Cadastrar receita"),
       ),
@@ -64,7 +64,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget imageItem(Recipe form){
     return InkWell(
       onTap: () => _registrationController.clickAddImage(form),
-      child: form.imgUrl == null 
+      child: form.imgPath == null 
       ? Container(
         height: 200,
         width: double.infinity,
@@ -79,7 +79,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ) : SizedBox(
         height: 300,
         width: double.infinity,
-        child: Image.file(File(form.imgUrl!), fit: BoxFit.cover)
+        child: Image.file(File(form.imgPath!), fit: BoxFit.cover)
       ),
     );
   }

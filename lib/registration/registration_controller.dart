@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:state_management_with_rxdart/enums.dart';
 import 'package:state_management_with_rxdart/registration/registration_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,13 +12,15 @@ class RegistrationController {
   final formKey = GlobalKey<FormState>();
 
   void initFormRegistration(){
-    controllerFormRegistration.sink.add(Recipe());
+    var recipe = Recipe();
+    recipe.startedTime = DateFormat("dd/MM/yy").format(DateTime.now()) + " às " + DateFormat("hh:mm").format(DateTime.now());
+    controllerFormRegistration.sink.add(recipe);
   }
 
   Future<void> clickAddImage(Recipe form) async {
     var image = await ImagePicker().pickImage(source: ImageSource.camera);
     if(image != null){
-      form.imgUrl = image.path;
+      form.imgPath = image.path;
       controllerFormRegistration.sink.add(form);
     }
   }

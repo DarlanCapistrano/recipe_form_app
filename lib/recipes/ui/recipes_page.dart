@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:state_management_with_rxdart/recipes/recipes_controller.dart';
 import 'package:state_management_with_rxdart/registration/registration_model.dart';
@@ -20,8 +21,8 @@ class _RecipesPageState extends State<RecipesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.red, title: const Text("Receitas")),
-    floatingActionButton: FloatingActionButton(onPressed: () => _recipesController.goToFormRegistratrion(context), child: const Icon(Icons.add)),
+      appBar: AppBar(backgroundColor: Colors.red[800], title: const Text("Receitas")),
+    floatingActionButton: FloatingActionButton(onPressed: () => _recipesController.goToFormRegistratrion(context), child: const Icon(Icons.add), backgroundColor: Colors.red[600],),
       body: streamRecipes(),
     );
   }
@@ -46,22 +47,44 @@ class _RecipesPageState extends State<RecipesPage> {
   }
 
   Widget bodyRecipes(List<Recipe> recipes){
-    return ListView.separated(
-      separatorBuilder: (context, index) => const Divider(color: Colors.grey),
-      itemCount: recipes.length,
-      itemBuilder: (context, index) => recipeItem(recipes[index]),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      child: ListView.separated(
+        separatorBuilder: (context, index) => Container(color: Colors.grey, height: 1),
+        itemCount: recipes.length,
+        itemBuilder: (context, index) => recipeItem(recipes[index]),
+      ),
     );
   }
 
   Widget recipeItem(Recipe recipe){
-    return Container(
-      margin: const EdgeInsets.only(left: 4, bottom: 4),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
         children: [
-          Text(recipe.mealName ?? "", style: const TextStyle(fontSize: 16)),
-          Text(recipe.startedTime.toString(), style: const TextStyle(fontSize: 16)),
+          imageRecipeItem(recipe.imgPath),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(recipe.mealName ?? "Nome indisponível", style: const TextStyle(fontSize: 16)),
+              Text("${recipe.difficulty ?? ""} - ${recipe.cost ?? ""}", style: const TextStyle(fontSize: 16)),
+              Text(recipe.startedTime.toString(), style: const TextStyle(fontSize: 16)),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  Widget imageRecipeItem(String? path){
+    bool hasImage = File("$path").existsSync();
+    return Container(
+      margin: const EdgeInsets.only(right: 8),
+      height: 70,
+      width: 70,
+      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 1), image: hasImage ? DecorationImage(image: FileImage(File(path!)), fit: BoxFit.cover) : null),
+      child: !hasImage ? const Icon(Icons.fastfood_outlined) : null,
     );
   }
 }
