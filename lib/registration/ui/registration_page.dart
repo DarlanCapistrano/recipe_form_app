@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:state_management_with_rxdart/enums.dart';
-import 'package:state_management_with_rxdart/extensions.dart';
-import 'package:state_management_with_rxdart/registration/registration_controller.dart';
-import 'package:state_management_with_rxdart/registration/registration_model.dart';
+import 'package:recipe_form_app/enums.dart';
+import 'package:recipe_form_app/extensions.dart';
+import 'package:recipe_form_app/registration/registration_controller.dart';
+import 'package:recipe_form_app/registration/registration_model.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -25,13 +25,23 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.red[800],
-        actions: [IconButton(onPressed: () => _registrationController.finishFormRegistration(context), icon: const Icon(Icons.check))],
-        title: const Text("Cadastrar receita"),
+    return Theme(
+      data: ThemeData(
+      inputDecorationTheme: InputDecorationTheme(
+        labelStyle: const TextStyle(color: Colors.black87),
+        focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.yellow[700]!)),
       ),
-      body: streamFormRegistration(),
+      textSelectionTheme: TextSelectionThemeData(cursorColor: Colors.yellow[700]),
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          foregroundColor: Colors.black,
+          backgroundColor: Colors.yellowAccent[700],
+          actions: [IconButton(onPressed: () => _registrationController.finishFormRegistration(context), icon: const Icon(Icons.check))],
+          title: const Text("Cadastrar receita"),
+        ),
+        body: streamFormRegistration(),
+      ),
     );
   }
 
@@ -103,14 +113,32 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Widget textFieldMealItem(Recipe form){
     return TextField(
-      decoration: const InputDecoration(labelText: "Nome da receita"),
+      decoration: InputDecoration(
+        label: RichText(
+          overflow: TextOverflow.ellipsis,
+          text: const TextSpan(
+            children: [
+              TextSpan(text: "Nome da receita", style: TextStyle(color: Colors.black87)),
+              TextSpan(text: " *", style: TextStyle(color: Colors.red)),
+            ]
+          ),
+        ),
+      ),
       onChanged: (text) => _registrationController.updateMealName(form, text),
     );
   }
 
   Widget dropDownCategoryItem(Recipe form){
     return DropdownButton<String>(
-      hint: Text(form.category ?? "Categorias"),
+      hint: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(text: form.category ?? "Categorias", style: const TextStyle(color: Colors.black87)),
+            const TextSpan(text: " *", style: TextStyle(color: Colors.red)),
+          ]
+        ),
+      ),
+      // hint: Text(form.category ?? "Categorias"),
       items: categoryTypesList.map((name) => DropdownMenuItem(child: Text(name), value: name)).toList(),
       onChanged: (newCategory) => _registrationController.updateCategory(form, newCategory),
     );
@@ -123,8 +151,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         key: _registrationController.formKey,
         child: TextFormField(
           keyboardType: const TextInputType.numberWithOptions(),
-          inputFormatters: [FilteringTextInputFormatter.deny(RegExp ("[,]"))],
-          decoration: const InputDecoration(labelText: "Tempo", hintText: "ex: 12 min"),
+          inputFormatters: [FilteringTextInputFormatter.deny(RegExp ("[.-]"))],
+          decoration: const InputDecoration(labelText: "Tempo (min)", hintText: "ex: 12 min",),
           onChanged: (text) => _registrationController.updateDuration(form, text),
           validator: (text){
             if(double.tryParse("$text".replaceAll(",", ".")) == null){
@@ -143,7 +171,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
       children: [
         Container(
           margin: const EdgeInsets.symmetric(vertical: 15),
-          child: Text(radioType.name.capitalize(), style: const TextStyle(fontSize: 22)),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(text: radioType.name.capitalize(), style: const TextStyle(color: Colors.black87, fontSize: 22)),
+                const TextSpan(text: " *", style: TextStyle(color: Colors.red, fontSize: 22)),
+              ]
+            ),
+          ),
         ),
         ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
@@ -151,6 +186,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           itemCount: items.length,
           itemBuilder: (context, index){
             return RadioListTile<String>(
+              activeColor: Colors.yellow[700],
               title: Text(items[index]),
               value: items[index],
               groupValue:  radioType == ItemRegistrationType.dificuldade ? form.difficulty : form.cost,
@@ -194,7 +230,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     decoration: InputDecoration(
                       hintText: "Adicionar ingrediente",
                       border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(onPressed: () => _registrationController.addIngredient(form, textController), icon: const Icon(Icons.add)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.yellowAccent[700]!)),
+                      suffixIcon: IconButton(onPressed: () => _registrationController.addIngredient(form, textController), icon: const Icon(Icons.add, color: Colors.black54)),
                     ),
                     controller: textController,
                   ),

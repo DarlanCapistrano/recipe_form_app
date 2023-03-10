@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(state_management_with_rxdart LANGUAGES CXX)
+project(recipe_form_app LANGUAGES CXX)
 
-set(BINARY_NAME "state_management_with_rxdart")
+set(BINARY_NAME "recipe_form_app")
 
 cmake_policy(SET CMP0063 NEW)
 

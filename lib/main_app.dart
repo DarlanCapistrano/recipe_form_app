@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:state_management_with_rxdart/recipes/ui/recipes_page.dart';
+import 'package:recipe_form_app/recipes/ui/recipes_page.dart';
 
 class MainApp extends StatefulWidget {
   const MainApp({ Key? key }) : super(key: key);

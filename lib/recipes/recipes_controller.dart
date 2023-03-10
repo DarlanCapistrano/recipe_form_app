@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:state_management_with_rxdart/registration/registration_model.dart';
-import 'package:state_management_with_rxdart/registration/ui/registration_page.dart';
+import 'package:recipe_form_app/registration/registration_model.dart';
+import 'package:recipe_form_app/registration/ui/registration_page.dart';
 
 class RecipesController {
   final controllerRecipes = BehaviorSubject<List<Recipe>>();
@@ -15,6 +15,7 @@ class RecipesController {
     if(recipe != null){
       var recipes = controllerRecipes.stream.value;
       recipes.add(recipe);
+
       controllerRecipes.sink.add(recipes);
     }
   }

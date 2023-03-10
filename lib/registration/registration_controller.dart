@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:state_management_with_rxdart/enums.dart';
-import 'package:state_management_with_rxdart/registration/registration_model.dart';
+import 'package:recipe_form_app/enums.dart';
+import 'package:recipe_form_app/registration/registration_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/subjects.dart';
 
@@ -70,6 +71,15 @@ class RegistrationController {
   }
 
   void finishFormRegistration(BuildContext context){
-    Navigator.pop(context, controllerFormRegistration.stream.valueOrNull);
+    var form = controllerFormRegistration.stream.value;
+    if(form.mealName != null && form.category != null && form.difficulty != null && form.cost != null){
+      if(form.ingredients.isNotEmpty){
+        Navigator.pop(context, form);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Adicione pelo menos um ingrediente."), backgroundColor: Colors.red[400]));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text("Preencha os campos obrigatórios!"), backgroundColor: Colors.red[400]));
+    }
   }
 }

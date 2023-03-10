@@ -1,6 +1,6 @@
 {
-    "name": "state_management_with_rxdart",
-    "short_name": "state_management_with_rxdart",
+    "name": "recipe_form_app",
+    "short_name": "recipe_form_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
