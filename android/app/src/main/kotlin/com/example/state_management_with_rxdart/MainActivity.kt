@@ -1,4 +1,4 @@
-package com.example.state_management_with_rxdart
+package com.example.recipe_form_app
 
 import io.flutter.embedding.android.FlutterActivity
 
